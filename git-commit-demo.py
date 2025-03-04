@@ -1,6 +1,6 @@
 import os
 import subprocess
-import openai
+from openai import OpenAI
 
 def get_git_diff():
     """Gets the staged changes from git."""
@@ -12,22 +12,29 @@ def get_git_diff():
 
 def generate_commit_message(diff, api_key):
     """Generates a commit message using OpenAI."""
-    openai.api_key = api_key
+    client = OpenAI(api_key=api_key)
 
     promptMessage = f"""Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message: """
 
     try:
-        response = openai.Completion.create(
-            engine="gpt-4o-mini",
-            prompt=promptMessage,
-            max_tokens=100,
-            n=1,
-            stop=None,
-            temperature=0.5, # Adjust for creativity. 0 is more deterministic
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "user", 
+                    "content": promptMessage
+                }
+            ],
+            stream=True,
         )
-        message = response.choices[0].text.strip()
-        return message
-    except openai.error.OpenAIError as e:
+
+        for message in response:
+            if message.choices[0].delta.content is not None:
+                print(message.choices[0], end="")
+
+            return message
+
+    except ValueError as e:
         print(f"Error communicating with OpenAI: {e}")
         return None
 
@@ -40,7 +47,7 @@ def commit_changes(message):
         print(f"Error committing: {e}")
 
 def main():
-    api_key = os.environ.get("OPENAI_API_KEY") # Get API key from environment variable
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         print("Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
         return
@@ -65,5 +72,4 @@ def main():
     else:
         print("Failed to generate commit message.")
 
-if __name__ == "__main__":
-    main()
+main()
