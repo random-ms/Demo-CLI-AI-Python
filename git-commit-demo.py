@@ -40,7 +40,7 @@ def generate_commit_message(diff, api_key):
 def commit_changes(message):
     """Commits the staged changes with the generated message."""
     try:
-        subprocess.run(["git", "commit", "-m ", message], check=True)
+        subprocess.run(["git", "commit", "-m", message], check=True)
         print("Commit successful!")
     except subprocess.CalledProcessError as e:
         print(f"Error committing: {e}")
