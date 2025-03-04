@@ -11,10 +11,9 @@ def get_git_diff():
         return None  # No staged changes
 
 def generate_commit_message(diff, api_key):
-    """Generates a commit message using OpenAI."""
     client = OpenAI(api_key=api_key)
 
-    promptMessage = f"""Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message: """
+    promptMessage = "Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message: "
 
     try:
         response = client.chat.completions.create(
@@ -41,7 +40,7 @@ def generate_commit_message(diff, api_key):
 def commit_changes(message):
     """Commits the staged changes with the generated message."""
     try:
-        subprocess.run(["git", "commit", "-m", message], check=True)
+        subprocess.run(["git", "commit", "-m ", message], check=True)
         print("Commit successful!")
     except subprocess.CalledProcessError as e:
         print(f"Error committing: {e}")
