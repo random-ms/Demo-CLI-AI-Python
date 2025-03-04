@@ -38,7 +38,7 @@ def generate_commit_message(diff, api_key):
         return None
 
 def commit_changes(message):
-    """Commits the staged changes with the generated message."""
+    """Commits the staged changes with the generated message. """
     try:
         subprocess.run(["git", "commit", "-m", message], check=True)
         print("Commit successful!")
