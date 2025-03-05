@@ -13,11 +13,10 @@ def get_git_diff():
 def generate_commit_message(diff, api_key):
     client = OpenAI(api_key=api_key)
 
-    promptMessage1 = f"""Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message:"""
-    promptMessage = "write a random sentence with a limit of 10 words."
-
+    promptMessage2 = f"""Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message:"""
+    promptMessage = "3 random words seperate with commas"
     try:
-        response = client.chat.completions.create(
+        stream = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
@@ -28,11 +27,12 @@ def generate_commit_message(diff, api_key):
             stream=True,
         )
 
-        for message in response:
-            if message.choices[0].delta.content is not None:
-                print(message.choices[0], end="")
+        message = ""
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                message += chunk.choices[0].delta.content
 
-            return message
+        return message
 
     except ValueError as e:
         print(f"Error communicating with OpenAI: {e}")
