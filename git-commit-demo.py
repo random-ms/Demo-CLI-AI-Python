@@ -13,8 +13,9 @@ def get_git_diff():
 def generate_commit_message(diff, api_key):
     client = OpenAI(api_key=api_key)
 
-    promptMessage2 = f"""Generate a concise and informative commit message based on the following git diff:\n\n{diff}\n\nCommit message:"""
+    promptMessage2 = f"""Generate a concise, meaningful commit message based on \n\n{diff}\n\nCommit message:"""
     promptMessage = "3 random words seperate with commas"
+
     try:
         stream = client.chat.completions.create(
             model="gpt-4o-mini",
